@@ -2,36 +2,115 @@ import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import CalcInputForm from "./components/CalcInputForm";
 import nedbetalingsplanService from "./services/nedbetalingsplanServices";
+import "fontsource-roboto";
+import { Container } from "@material-ui/core";
+import Nedbetalingsplan from "./components/Nedbetalingsplan.js";
+
 const title = "Lånekalkulator";
+const gebyr = 30;
 
 const App = () => {
   const [nedbetalingsplan, setNedbetalingsplan] = useState({});
+  const [laanebelop, setLaanebelop] = useState(0);
+  const [rente, setRente] = useState(3.0); //default 3.0% rente
+  const [varighet, setVarighet] = useState(25); //default 25% rente
+  const [utlopsDato, setUtlopsDato] = useState("");
+  const [saldoDato, setSaldoDato] = useState("");
+  const [datoForsteInnbetaling, setDatoForsteInnbetaling] = useState("");
 
-  const dummyPayload = {
-    laanebelop: 2000000,
-    nominellRente: 3,
-    terminGebyr: 30,
-    utlopsDato: "2045-01-01",
-    saldoDato: "2020-01-01",
-    datoForsteInnbetaling: "2020-02-01",
-    ukjentVerdi: "TERMINBELOP",
+  /**
+   * Håndterer endringer i tekst-input elementet der bruker velger lånebeløp
+   * @param {DOMEvent} event
+   */
+  const handleLaanebelopChange = (event) => {
+    console.log(event.target.value)
+    setLaanebelop(event.target.value);
   };
 
-  useEffect(() => {
-    nedbetalingsplanService
-      .lagNedbetalingsplan(dummyPayload)
-      .then((plan) => {
-        console.log(plan.nedbetalingsplan)
-        setNedbetalingsplan(plan);
-      })
-      .catch(error => console.log(error));
-  }, [])
+  /**
+   * Håndterer rangeslideren der bruker velger lånets varighet
+   * @param {DOMEvent} event
+   */
+  const handleVarighetChange = (event, value) => {
+    setVarighet(value);
+  };
 
+  /**
+   * Håndterer endring av rangeslideren der bruker velger rente
+   * @param {DOMEvent} event
+   */
+  const handleRenteChange = (event, value) => {
+    setRente(value);
+  };
+
+  /**
+   * Når all data sendes vil denne metoden sette nedbetalingsplanen i state.
+   * @param {DOMEvent} event
+   */
+  const handleFormSubmit = (event) => {
+    event.preventDefault();
+
+    const idag = new Date();
+    const idagFormatert = idag.toISOString().substring(0, 10);
+    setSaldoDato(idagFormatert);
+
+    const forsteInnbetalingDato = new Date(
+      idag.getFullYear(),
+      idag.getMonth() + 1,
+      idag.getDate()
+    );
+    const forsteInnbetalingDatoFormatert = forsteInnbetalingDato
+      .toISOString()
+      .substring(0, 10);
+    setDatoForsteInnbetaling(forsteInnbetalingDatoFormatert);
+
+    let utlopsAar = idag.getFullYear() + varighet;
+    let utlopsMnd = idag.getMonth();
+    let utlopsDag = idag.getDate();
+    console.log(utlopsAar)
+    console.log(utlopsMnd)
+    console.log(utlopsDag)
+    console.log("varighet: ", varighet);
+    const datoForSisteInnbetaling = new Date(utlopsAar, utlopsMnd, utlopsDag);
+    const datoForSisteInnbetalingFormatert = datoForSisteInnbetaling
+      .toISOString()
+      .substring(0, 10);
+    setUtlopsDato(datoForSisteInnbetaling);
+
+    const payload = {
+      laanebelop: laanebelop,
+      nominellRente: rente,
+      terminGebyr: gebyr,
+      // varighet: varighet,
+      utlopsDato: datoForSisteInnbetalingFormatert,
+      saldoDato: idagFormatert,
+      datoForsteInnbetaling: forsteInnbetalingDatoFormatert,
+      ukjentVerdi: "TERMINBELOP",
+    };
+
+    nedbetalingsplanService
+      .genererNedbetalingsplan(payload)
+      .then((returned) => {
+        setNedbetalingsplan(returned.nedbetalingsplan.innbetalinger);
+      })
+      .catch((error) => console.log(error));
+
+  };
+
+    
   return (
-    <div>
-      <Header title={title} />
-      <CalcInputForm />
-    </div>
+      <Container fixed>
+        <Header title={title} />
+        <CalcInputForm
+          handleSubmit={handleFormSubmit}
+          handleLaanebelopChange={handleLaanebelopChange}
+          handleNedbetalingstidChange={handleVarighetChange}
+          handleRenteChange={handleRenteChange}
+        />
+        {nedbetalingsplan.length > 0 && 
+          <Nedbetalingsplan nedbetalingsplan={nedbetalingsplan}/>
+        }
+      </Container>
   );
 };
 
