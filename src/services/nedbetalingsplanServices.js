@@ -1,11 +1,13 @@
 import axios from "axios";
-const baseUrl =
+const staccUrl =
   "https://visningsrom.stacc.com/dd_server_laaneberegning/rest/laaneberegning/v1/nedbetalingsplan";
 
-const url = "http://localhost:3001/api/nedbetalingsplanFraTil";
+const baseUrl = "/api/nedbetalingsplanFraTil";
+
+const deployedUrl = "https://lit-tundra-27242.herokuapp.com/api/nedbetalingsplanFraTil"
 
 const genererNedbetalingsplan =  async payload => {
-  const request = axios.post(url, payload);
+  const request = axios.post(baseUrl, payload);
   const response = await request;
   return response.data;
 };
