@@ -5,6 +5,7 @@ import nedbetalingsplanService from "./services/nedbetalingsplanServices";
 import "fontsource-roboto";
 import { Container } from "@material-ui/core";
 import Nedbetalingsplan from "./components/Nedbetalingsplan.js";
+import Notification from "./components/Notification";
 
 const title = "Lånekalkulator";
 const gebyr = 30;
@@ -17,13 +18,21 @@ const App = () => {
   const [utlopsDato, setUtlopsDato] = useState("");
   const [saldoDato, setSaldoDato] = useState("");
   const [datoForsteInnbetaling, setDatoForsteInnbetaling] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState(null);
+
+
+  const notify = text => {
+    setNotificationMessage(text)
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 5000)
+  }
 
   /**
    * Håndterer endringer i tekst-input elementet der bruker velger lånebeløp
    * @param {DOMEvent} event
    */
   const handleLaanebelopChange = (event) => {
-    console.log(event.target.value)
     setLaanebelop(event.target.value);
   };
 
@@ -67,10 +76,7 @@ const App = () => {
     let utlopsAar = idag.getFullYear() + varighet;
     let utlopsMnd = idag.getMonth();
     let utlopsDag = idag.getDate();
-    console.log(utlopsAar)
-    console.log(utlopsMnd)
-    console.log(utlopsDag)
-    console.log("varighet: ", varighet);
+    
     const datoForSisteInnbetaling = new Date(utlopsAar, utlopsMnd, utlopsDag);
     const datoForSisteInnbetalingFormatert = datoForSisteInnbetaling
       .toISOString()
@@ -84,16 +90,16 @@ const App = () => {
       // varighet: varighet,
       utlopsDato: datoForSisteInnbetalingFormatert,
       saldoDato: idagFormatert,
-      datoForsteInnbetaling: forsteInnbetalingDatoFormatert,
-      ukjentVerdi: "TERMINBELOP",
     };
+    
 
     nedbetalingsplanService
       .genererNedbetalingsplan(payload)
       .then((returned) => {
-        setNedbetalingsplan(returned.nedbetalingsplan.innbetalinger);
+        setNedbetalingsplan(returned);
+        notify(`Nedbetalingsplan generert`)
       })
-      .catch((error) => console.log(error));
+      .catch((error) => notify(`Feil, lånebeløp må være over 10,000 kr`));
 
   };
 
@@ -101,15 +107,19 @@ const App = () => {
   return (
       <Container fixed>
         <Header title={title} />
+        <Notification message={notificationMessage}/>
         <CalcInputForm
           handleSubmit={handleFormSubmit}
           handleLaanebelopChange={handleLaanebelopChange}
           handleNedbetalingstidChange={handleVarighetChange}
           handleRenteChange={handleRenteChange}
         />
+        <div style={{marginTop: "10px"}}>
         {nedbetalingsplan.length > 0 && 
           <Nedbetalingsplan nedbetalingsplan={nedbetalingsplan}/>
         }
+        </div>
+        
       </Container>
   );
 };
