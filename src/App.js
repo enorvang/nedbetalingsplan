@@ -91,6 +91,16 @@ const App = () => {
       utlopsDato: datoForSisteInnbetalingFormatert,
       saldoDato: idagFormatert,
     };
+
+    if(!Number.isInteger(Number(laanebelop))){
+      notify(`Feil, lånebeløpet må være tall!`);
+      return;
+    }
+
+    if(Number(laanebelop < 10000)){
+      notify(`Feil, lånebeløp må være over 10,000 kr`);
+      return;
+    }
     
 
     nedbetalingsplanService
@@ -99,7 +109,7 @@ const App = () => {
         setNedbetalingsplan(returned);
         notify(`Nedbetalingsplan generert`)
       })
-      .catch((error) => notify(`Feil, lånebeløp må være over 10,000 kr`));
+      .catch((error) => console.log(error));
 
   };
 
