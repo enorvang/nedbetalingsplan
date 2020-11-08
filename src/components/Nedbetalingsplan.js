@@ -14,43 +14,47 @@ const columns = [
     id: "restgjeld",
     label: "Restgjeld",
     minWidth: 100,
-    format: (value) => value.toLocaleString('nb-NO') + " kr",
+    format: (value) => value.toLocaleString('nb-NO', { maximumFractionDigits: 2 }) + " kr",
   },
   { id: "dato", label: "Dato", minWidth: 100 },
   {
     id: "innbetaling",
-    label: "Innbetaling",
+    label: "Avdrag",
     minWidth: 100,
-    format: (value) => value.toLocaleString('nb-NO') + " kr",
+    format: (value) => value.toLocaleString('nb-NO', { maximumFractionDigits: 2 }) + " kr",
   },
   {
     id: "gebyr",
     label: "Gebyr",
     minWidth: 100,
-    format: (value) => value.toLocaleString('nb-NO') + " kr",
+    format: (value) => value.toLocaleString('nb-NO', { maximumFractionDigits: 2 }) + " kr",
   },
   {
     id: "renter",
     label: "Renter",
     minWidth: 100,
-    format: (value) => value.toLocaleString('nb-NO') + " kr",
+    format: (value) => value.toLocaleString('nb-NO', { maximumFractionDigits: 2 }) + " kr",
   },
   {
     id: "total",
-    label: "Total",
+    label: "Terminbeløp",
     minWidth: 100,
-    format: (value) => value.toLocaleString('nb-NO') + " kr",
+    format: (value) => value.toLocaleString('nb-NO', { maximumFractionDigits: 2 }) + " kr",
   },
 ];
 const useStyles = makeStyles({
   root: {
-    width: "80%",
+    width: "100%",
   },
   container: {
     maxHeight: 440,
   },
 });
 
+/**
+ * 
+ * @param {Array} nedbetalingsplan 
+ */
 const Nedbetalingsplan = ({ nedbetalingsplan }) => {
   const classes = useStyles();
   const [page, setPage] = useState(0);
