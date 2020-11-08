@@ -52,6 +52,10 @@ const App = () => {
     setRente(value);
   };
 
+  const handleRenteInputChange = (event) => {
+    setRente(event.target.value === '' ? 0 : Number(event.target.value));
+  };
+
   /**
    * Når all data sendes vil denne metoden sette nedbetalingsplanen i state.
    * @param {DOMEvent} event
@@ -123,6 +127,7 @@ const App = () => {
           handleLaanebelopChange={handleLaanebelopChange}
           handleNedbetalingstidChange={handleVarighetChange}
           handleRenteChange={handleRenteChange}
+          handleRenteInputChange={handleRenteInputChange}
         />
         <div style={{marginTop: "10px"}}>
         {nedbetalingsplan.length > 0 && 

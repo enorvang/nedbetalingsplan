@@ -33,8 +33,8 @@ const varighetValueText = (value) => `${value} år`;
 
 const renteSliderMarks = [
   {
-    value: 0.25,
-    label: "0.25 %",
+    value: 0.01,
+    label: "0.01 %",
   },
   {
     value: 3.0,
@@ -83,8 +83,8 @@ const CalcInputForm = ({
         </Typography>
         <Slider
           defaultValue={3.0}
-          step={0.25}
-          min={0.25}
+          step={0.01}
+          min={0.01}
           max={10.0}
           getAriaValueText={renteValueText}
           aria-labelledby="discrete-slider-always"
